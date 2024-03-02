@@ -8,13 +8,11 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type AuthService struct {
 	UserRepository repository.UserRepository
 	TokenSecret    string
-	TokenLifetime  time.Duration
 }
 
 func (s *AuthService) RegisterUser(ctx context.Context, email, password, username string) (string, error) {
@@ -80,16 +78,6 @@ func (s *AuthService) GetUserByToken(ctx context.Context, tokenString string) (*
 		return nil, err
 	}
 
-	// Check if the token is expired
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		expirationTime := time.Unix(int64(claims["exp"].(float64)), 0)
-		if time.Now().UTC().After(expirationTime) {
-			return nil, errors.New("token is expired")
-		}
-	} else {
-		return nil, errors.New("invalid token claims")
-	}
-
 	// Extract the user ID from the token
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
@@ -118,16 +106,6 @@ func (s *AuthService) VerifyToken(ctx context.Context, tokenString string) (int6
 	token, err := s.parseToken(tokenString)
 	if err != nil {
 		return 0, err
-	}
-
-	// Check if the token is expired
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		expirationTime := time.Unix(int64(claims["exp"].(float64)), 0)
-		if time.Now().UTC().After(expirationTime) {
-			return 0, errors.New("token is expired")
-		}
-	} else {
-		return 0, errors.New("invalid token claims")
 	}
 
 	// Extract the user ID from the token
@@ -172,7 +150,6 @@ func (s *AuthService) generateToken(userID int64) (string, error) {
 	// Create a new JWT token with a custom claim containing the user ID
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID": userID,
-		"exp":    time.Now().Add(s.TokenLifetime).Unix(),
 	})
 
 	// Sign the token using the secret key
@@ -206,8 +183,4 @@ func (s *AuthService) parseToken(tokenString string) (*jwt.Token, error) {
 	}
 
 	return token, nil
-}
-
-func (s *AuthService) getTokenExpirationTime() time.Time {
-	return time.Now().Add(s.TokenLifetime)
 }

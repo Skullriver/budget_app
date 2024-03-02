@@ -13,9 +13,19 @@ struct DashboardView: View {
     @EnvironmentObject var viewModel: AuthViewModel
     
     var body: some View {
+        
         if let user = viewModel.currentUser {
             Text(user.username)
+            Button{
+                Task {
+                    viewModel.signOut()
+                }
+            } label: {
+                PrimaryButton(title: "Sign Out")
+                    .padding(.bottom, 35)
+            }
         }
+        
     }
 }
 

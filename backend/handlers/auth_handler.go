@@ -42,7 +42,6 @@ func NewAuthHandler(db *sql.DB, tokenSecret string) *AuthHandler {
 	auth := &services.AuthService{
 		UserRepository: repository.NewPostgresUserRepository(db),
 		TokenSecret:    tokenSecret,
-		TokenLifetime:  time.Duration(3600) * time.Second,
 	}
 	return &AuthHandler{auth: auth}
 }

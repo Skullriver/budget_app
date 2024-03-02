@@ -9,125 +9,100 @@ import SwiftUI
 
 struct SignUpView: View {
     
-    @State private var username: String = ""
-    @State private var email: String = ""
-    @State private var password: String = ""
+    enum FocusableField: Hashable {
+        case username, email, password
+    }
+    
     @EnvironmentObject var viewModel: AuthViewModel
+    @ObservedObject var signupVM = SignupViewModel()
+    
+    @FocusState private var focusedField: FocusableField?
     
     var body: some View {
-    
+        
         NavigationView{
-            VStack {
-                Spacer()
+            
+            ScrollView {
+                
                 VStack {
-                    
-                    Image("logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: .widthPer(per: 0.6))
-                        .padding(.top, 10)
-                    Text("SophistiSpend")
-                        .font(.system(size: 32).monospaced())
-                        .fontWeight(.medium)
-                        .foregroundColor(.text)
-                        .padding(.bottom, 40)
-                    
-                    
+                    Spacer()
                     VStack {
-                        HStack {
-                            Image(systemName: "person")
-                                .foregroundColor(.text.opacity(0.8))
-                                .frame(width: 15, height: 15, alignment: Alignment.center)
-                            TextField("Name", text: $username)
-                                .font(.system(size: 16).monospaced())
-                                .padding(.vertical, 15)
-                                .padding(.leading, 10)
-                        }
-                        .padding(.horizontal, 15)
-                        .background(Color.white)
-                        .cornerRadius(55)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 55)
-                                .stroke(Color.text.opacity(0.8), lineWidth: 1)
-                        )
-                        .padding(.horizontal, 37)
-                        .padding(.bottom, 20)
                         
-                        HStack {
-                            Image(systemName: "envelope")
-                                .foregroundColor(.text.opacity(0.8))
-                                .frame(width: 15, height: 15, alignment: Alignment.center)
-                            TextField("Email", text: $email)
-                                .font(.system(size: 16).monospaced())
-                                .autocapitalization(.none)
-                                .padding(.vertical, 15)
-                                .padding(.leading, 10)
-                        }
-                        .padding(.horizontal, 15)
-                        .background(Color.white)
-                        .cornerRadius(55)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 55)
-                                .stroke(Color.text.opacity(0.8), lineWidth: 1)
-                        )
-                        .padding(.horizontal, 37)
-                        .padding(.vertical, 20)
+                        Image("logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: .widthPer(per: 0.6))
+                            .padding(.top, 10)
+                        Text("SophistiSpend")
+                            .font(.system(size: 32).monospaced())
+                            .fontWeight(.medium)
+                            .foregroundColor(.text)
+                            .padding(.bottom, 40)
                         
-                        HStack {
-                            Image(systemName: "lock")
-                                .foregroundColor(.text.opacity(0.8))
-                                .frame(width: 15, height: 15, alignment: Alignment.center)
-                            SecureField("Password", text: $password)
-                                .font(.system(size: 16).monospaced())
-                                .padding(.vertical, 15)
-                                .padding(.leading, 10)
+                        
+                        VStack {
+                            
+                            AuthTextField(field: $signupVM.name, sfSymbolName: "person", placeHolder: "Name", prompt: signupVM.namePrompt)
+                                .onTapGesture {
+                                    signupVM.userStartedTypingName = true
+                                }
+                                .padding(.horizontal, 37)
+                            
+                            AuthTextField(field: $signupVM.email, sfSymbolName: "envelope", placeHolder: "Email", prompt: signupVM.emailPrompt)
+                                .onTapGesture {
+                                    signupVM.userStartedTypingEmail = true
+                                }
+                                .padding(.horizontal, 37)
+                            
+                            AuthTextField(field: $signupVM.password, sfSymbolName: "lock", placeHolder: "Password", prompt: signupVM.passwordPrompt, isSecure: true)
+                                .onTapGesture {
+                                    signupVM.userStartedTypingPassword = true
+                                }
+                                .padding(.horizontal, 37)
                         }
-                        .padding(.horizontal, 15)
-                        .background(Color.white)
-                        .cornerRadius(55)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 55)
-                                .stroke(Color.text.opacity(0.8), lineWidth: 1)
-                        )
-                        .padding(.horizontal, 37)
-                        .padding(.top, 20)
+                        .padding(.bottom, 15)
+                        
                     }
+                    Spacer()
                     
-                }
-                Spacer()
-                
-                Button{
-                    Task {
-                        try await viewModel.register(username: username, email: email, password: password)
-                    }
-                } label: {
-                    PrimaryButton(title: "Sign Up")
-                        .padding(.bottom, 35)
-                }
-                
-                
-                HStack {
-                    Text("Already a member?")
-                        .font(.system(size: 14).monospaced())
-                    
-                    NavigationLink{
-                        LoginView()
+                    Button{
+                        Task {
+                            try await viewModel.register(username: signupVM.name, email: signupVM.email, password: signupVM.password)
+                        }
                     } label: {
-                        Text("Login")
-                            .font(.system(size: 14).monospaced())
-                            .foregroundColor(.primaryButton)
+                        PrimaryButton(title: "Sign Up")
+                            .padding(.bottom, 35)
                     }
-                
+                    .opacity(signupVM.isSignUpComplete ? 1 : 0.6)
+                    .disabled(!signupVM.isSignUpComplete)
+                    
+                    
+                    HStack {
+                        Text("Already a member?")
+                            .font(.system(size: 14).monospaced())
+                        
+                        NavigationLink{
+                            LoginView()
+                        } label: {
+                            Text("Login")
+                                .font(.system(size: 14).monospaced())
+                                .foregroundColor(.primaryButton)
+                        }
+                        
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 15)
+                    Spacer()
+                    
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 15)
-                Spacer()
                 
             }
             .background(Color.background)
-            .edgesIgnoringSafeArea(.all)
+//            .edgesIgnoringSafeArea(.all)
+            
         }
         .navigationBarBackButtonHidden()
+//        .keyboardAwarePadding()
     }
     
 }
@@ -135,3 +110,4 @@ struct SignUpView: View {
 #Preview {
     SignUpView()
 }
+

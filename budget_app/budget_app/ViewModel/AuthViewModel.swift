@@ -9,7 +9,11 @@ import Foundation
 
 @MainActor
 class AuthViewModel: ObservableObject {
-    @Published var userSession: String?
+    @Published var userSession: String? {
+        didSet {
+            UserDefaults.standard.set(userSession, forKey: "userSession")
+        }
+    }
     @Published var currentUser: User?
     
     init() {
@@ -34,8 +38,14 @@ class AuthViewModel: ObservableObject {
             }
     }
     
+    func signOut() {
+        self.userSession = nil
+        self.currentUser = nil
+    }
+    
     func fetchUser() async {
         if let token = self.userSession {
+            print(token)
             switch await NetworkService.shared.getUser(token: token) {
                 case .success(let user):
                     self.currentUser = user
