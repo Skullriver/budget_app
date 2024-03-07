@@ -16,6 +16,7 @@ type UserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	UpdateUser(ctx context.Context, user *models.User) error
 	DeleteUser(ctx context.Context, id int64) error
+	CopyPredefinedCategoriesToUser(ctx context.Context, id int64)
 }
 
 type postgresUserRepository struct {
@@ -80,4 +81,39 @@ func (r *postgresUserRepository) DeleteUser(ctx context.Context, id int64) error
 		return fmt.Errorf("failed to delete user: %v", err)
 	}
 	return nil
+}
+
+func (r *postgresUserRepository) CopyPredefinedCategoriesToUser(ctx context.Context, userID int64) {
+
+	predefinedCategories := []models.Category{
+		{Name: "Groceries", Icon: "cart", Color: "#4CAF50"},
+		{Name: "Utilities", Icon: "bolt.fill", Color: "#2196F3"},
+		{Name: "Transport", Icon: "car.fill", Color: "#FF9800"},
+		{Name: "Restaurants", Icon: "fork.knife", Color: "#F44336"},
+		{Name: "Entertainment", Icon: "film", Color: "#9C27B0"},
+		{Name: "Health & Wellness", Icon: "cross.case.fill", Color: "#E91E63"},
+		{Name: "Education", Icon: "books.vertical.fill", Color: "#1976D2"},
+		{Name: "Savings & Investments", Icon: "banknote.fill", Color: "#FFEB3B"},
+		{Name: "Housing", Icon: "house.fill", Color: "#795548"},
+		{Name: "Salary", Icon: "creditcard.fill", Color: "#CDDC39"},
+	}
+
+	// Prepare the insert statement for better performance
+	stmt, err := r.db.PrepareContext(ctx, `INSERT INTO categories (name, iconcode, colorcode, userid) VALUES ($1, $2, $3, $4)`)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	// Insert these predefined categories for the specified user
+	for _, category := range predefinedCategories {
+		_, err := stmt.ExecContext(ctx, category.Name, category.Icon, category.Color, userID)
+		if err != nil {
+			// Handle the error, consider transaction rollback if necessary
+			return
+		}
+	}
+
+	return
+
 }

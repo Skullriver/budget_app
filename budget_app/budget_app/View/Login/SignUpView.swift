@@ -9,14 +9,10 @@ import SwiftUI
 
 struct SignUpView: View {
     
-    enum FocusableField: Hashable {
-        case username, email, password
-    }
-    
     @EnvironmentObject var viewModel: AuthViewModel
     @ObservedObject var signupVM = SignupViewModel()
     
-    @FocusState private var focusedField: FocusableField?
+    @FocusState private var focusedField: String?
     
     var body: some View {
         
@@ -43,23 +39,32 @@ struct SignUpView: View {
                         VStack {
                             
                             AuthTextField(field: $signupVM.name, sfSymbolName: "person", placeHolder: "Name", prompt: signupVM.namePrompt)
+                                .focused($focusedField, equals: "name")
                                 .onTapGesture {
                                     signupVM.userStartedTypingName = true
+                                    focusedField = "name"
                                 }
                                 .padding(.horizontal, 37)
                             
                             AuthTextField(field: $signupVM.email, sfSymbolName: "envelope", placeHolder: "Email", prompt: signupVM.emailPrompt)
+                                .focused($focusedField, equals: "email")
                                 .onTapGesture {
                                     signupVM.userStartedTypingEmail = true
+                                    focusedField = "email"
                                 }
                                 .padding(.horizontal, 37)
                             
                             AuthTextField(field: $signupVM.password, sfSymbolName: "lock", placeHolder: "Password", prompt: signupVM.passwordPrompt, isSecure: true)
+                                .focused($focusedField, equals: "password")
                                 .onTapGesture {
                                     signupVM.userStartedTypingPassword = true
+                                    focusedField = "password"
                                 }
+                                .padding(.top, 1)
                                 .padding(.horizontal, 37)
                         }
+                        .onAppear(perform: focusFirstField)
+                        .onSubmit(focusNextField)
                         .padding(.bottom, 15)
                         
                     }
@@ -98,16 +103,39 @@ struct SignUpView: View {
                 
             }
             .background(Color.background)
-//            .edgesIgnoringSafeArea(.all)
             
         }
         .navigationBarBackButtonHidden()
-//        .keyboardAwarePadding()
     }
     
+    func focusFirstField() {
+        focusedField = "name"
+        signupVM.userStartedTypingName = true
+    }
+
+    func focusNextField() {
+        switch focusedField {
+        case "name":
+            focusedField = "email"
+            signupVM.userStartedTypingEmail = true
+        case "email":
+            focusedField = "password"
+            signupVM.userStartedTypingPassword = true
+        case "password":
+            focusedField = nil
+        case .none:
+            break
+        case .some(_):
+            break
+        }
+    }
 }
 
-#Preview {
-    SignUpView()
+
+struct SignUpView_Previews: PreviewProvider {
+    static var previews: some View {
+        SignUpView()
+        SignUpView().preferredColorScheme(.dark)
+    }
 }
 

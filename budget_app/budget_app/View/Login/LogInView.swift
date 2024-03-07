@@ -9,104 +9,106 @@ import SwiftUI
 
 struct LoginView: View {
     
-    @State private var email: String = ""
-    @State private var password: String = ""
-    @State private var isLoginActive = false
-    @State private var isSignUpActive = false
+    @EnvironmentObject var viewModel: AuthViewModel
+    @ObservedObject var signupVM = SignupViewModel()
+    @FocusState private var focusedField: String?
     
     var body: some View {
     
         NavigationView {
-            VStack {
-                
-                Spacer()
-                
+            ScrollView {
                 VStack {
                     
-                    Image("logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: .widthPer(per: 0.6))
-                        .padding(.top, 10)
-                    Text("SophistiSpend")
-                        .font(.system(size: 32).monospaced())
-                        .fontWeight(.medium)
-                        .foregroundColor(.text)
-                        .padding(.bottom, 40)
-                    
+                    Spacer()
                     
                     VStack {
-                        HStack {
-                            Image(systemName: "envelope")
-                                .foregroundColor(.text.opacity(0.8))
-                                .frame(width: 15, height: 15, alignment: Alignment.center)
-                            TextField("Email", text: $email)
-                                .font(.system(size: 16).monospaced())
-                                .autocapitalization(.none)
-                                .padding(.vertical, 15)
-                                .padding(.leading, 10)
-                        }
-                        .padding(.horizontal, 15)
-                        .background(Color.white)
-                        .cornerRadius(55)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 55)
-                                .stroke(Color.text.opacity(0.8), lineWidth: 1)
-                        )
-                        .padding(.horizontal, 37)
-                        .padding(.bottom, 20)
                         
-                        HStack {
-                            Image(systemName: "lock")
-                                .foregroundColor(.text.opacity(0.8))
-                                .frame(width: 15, height: 15, alignment: Alignment.center)
-                            SecureField("Password", text: $password)
-                                .font(.system(size: 16).monospaced())
-                                .padding(.vertical, 15)
-                                .padding(.leading, 10)
+                        Image("logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: .widthPer(per: 0.6))
+                            .padding(.top, 10)
+                        Text("SophistiSpend")
+                            .font(.system(size: 32).monospaced())
+                            .fontWeight(.medium)
+                            .foregroundColor(.text)
+                            .padding(.bottom, 40)
+                        
+                        
+                        VStack {
+                            
+                            AuthTextField(field: $signupVM.email, sfSymbolName: "envelope", placeHolder: "Email", prompt: "")
+                                .focused($focusedField, equals: "email")
+                                .onTapGesture {
+                                    focusedField = "email"
+                                }
+                                .padding(.horizontal, 37)
+                            
+                            AuthTextField(field: $signupVM.password, sfSymbolName: "lock", placeHolder: "Password", prompt: "", isSecure: true)
+                                .focused($focusedField, equals: "password")
+                                .onTapGesture {
+                                    focusedField = "password"
+                                }
+                                .padding(.top, 1)
+                                .padding(.horizontal, 37)
                         }
-                        .padding(.horizontal, 15)
-                        .background(Color.white)
-                        .cornerRadius(55)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 55)
-                                .stroke(Color.text.opacity(0.8), lineWidth: 1)
-                        )
-                        .padding(.horizontal, 37)
-                        .padding(.top, 20)
+                        .onAppear(perform: focusFirstField)
+                        .onSubmit(focusNextField)
                     }
-                }
-                
-                Spacer()
-                
-                NavigationLink{
                     
-                } label: {
-                    PrimaryButton(title: "Log in")
-                        .padding(.bottom, 35)
-                }
-                
-                HStack {
-                    Text("Not a member?")
-                        .font(.system(size: 14).monospaced())
+                    Spacer()
                     
-                    NavigationLink{
-                        SignUpView()
+                    Button{
+                        Task {
+                            try await viewModel.login(email: signupVM.email, password: signupVM.password)
+                        }
                     } label: {
-                        Text("Sign up")
-                            .font(.system(size: 14).monospaced())
-                            .foregroundColor(.primaryButton)
+                        PrimaryButton(title: "Log in")
+                            .padding(.bottom, 35)
                     }
+                    .opacity(signupVM.isLogInComplete ? 1 : 0.6)
+                    .disabled(!signupVM.isLogInComplete)
+                    
+                    HStack {
+                        Text("Not a member?")
+                            .font(.system(size: 14).monospaced())
+                        
+                        NavigationLink{
+                            SignUpView()
+                        } label: {
+                            Text("Sign up")
+                                .font(.system(size: 14).monospaced())
+                                .foregroundColor(.primaryButton)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 15)
+                    Spacer()
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 15)
-                Spacer()
+                
+                
             }
             .background(Color.background)
-            .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-            
         }
         .navigationBarBackButtonHidden()
+    }
+    
+    func focusFirstField() {
+        focusedField = "email"
+    }
+
+    func focusNextField() {
+        switch focusedField {
+        case "email":
+            focusedField = "password"
+            signupVM.userStartedTypingPassword = true
+        case "password":
+            focusedField = nil
+        case .none:
+            break
+        case .some(_):
+            break
+        }
     }
 }
 

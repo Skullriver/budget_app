@@ -9,6 +9,9 @@ import Foundation
 
 @MainActor
 class AuthViewModel: ObservableObject {
+    
+    static let shared = AuthViewModel()
+    
     @Published var userSession: String? {
         didSet {
             UserDefaults.standard.set(userSession, forKey: "userSession")
@@ -29,6 +32,20 @@ class AuthViewModel: ObservableObject {
             switch result {
             case .success(let token):
                 print("Registration successful. Token: \(token)")
+                // Handle successful registration
+                self.userSession = token
+                await fetchUser()
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+                // Handle failure
+            }
+    }
+    
+    func login(email: String,  password: String) async throws{
+        let result = await NetworkService.shared.login(email: email, password: password)
+            switch result {
+            case .success(let token):
+                print("Login successful. Token: \(token)")
                 // Handle successful registration
                 self.userSession = token
                 await fetchUser()

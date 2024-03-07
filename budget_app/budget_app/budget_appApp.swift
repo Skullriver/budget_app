@@ -9,13 +9,15 @@ import SwiftUI
 
 @main
 struct budget_appApp: App {
-    let persistenceController = PersistenceController.shared
+
     @StateObject var viewModel = AuthViewModel()
+    @StateObject var tabViewModel = TabViewModel()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(viewModel)
+                .environmentObject(tabViewModel)
         }
     }
 }

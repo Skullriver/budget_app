@@ -25,7 +25,9 @@ type RegisterRequest struct {
 }
 
 type LoginResponse struct {
-	Token string `json:"token"`
+	Message string `json:"message"`
+	Token   string `json:"token"`
+	Success bool   `json:"success"`
 }
 
 type RegisterResponse struct {
@@ -77,7 +79,7 @@ func (h *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create a LoginResponse with the JWT token
-	resp := LoginResponse{Token: token}
+	resp := LoginResponse{Message: "User login successful", Token: token, Success: true}
 	json.NewEncoder(w).Encode(resp)
 }
 

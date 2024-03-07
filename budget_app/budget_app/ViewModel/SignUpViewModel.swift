@@ -44,6 +44,13 @@ class SignupViewModel: ObservableObject {
         return true
     }
     
+    var isLogInComplete: Bool {
+        if password.isEmpty || email.isEmpty || !isEmailValid(){
+            return false
+        }
+        return true
+    }
+    
     var namePrompt: String {
         return userStartedTypingName ? (isNameValid() ? "" : "Name can't be empty") : ""
     }
@@ -56,6 +63,5 @@ class SignupViewModel: ObservableObject {
     var passwordPrompt: String {
         return userStartedTypingPassword ? (isPasswordValid() ? "" : "Must be between 8 and 15 characters containing at least one number and one capital letter") : ""
     }
-    
     
 }

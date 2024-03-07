@@ -28,7 +28,12 @@ struct RegisterRequestBody: Codable {
     let password: String
 }
 
-struct RegisterResponse: Codable {
+struct LoginRequestBody: Codable {
+    let email: String
+    let password: String
+}
+
+struct AuthResponse: Codable {
     let token: String?
     let message: String?
     let success: Bool?
@@ -60,7 +65,7 @@ class NetworkService {
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
             
-            guard let registerResponse = try? JSONDecoder().decode(RegisterResponse.self, from: data) else {
+            guard let registerResponse = try? JSONDecoder().decode(AuthResponse.self, from: data) else {
                 return .failure(.invalidCredentials)
             }
             
@@ -73,6 +78,41 @@ class NetworkService {
             return .failure(.networkError)
         }
         
+    }
+    
+    func login(email: String, password: String) async -> Result<String, AuthenticationError> {
+        
+        guard let url = URL(string: "http://localhost:8080/user/login") else {
+            return .failure(.invalidURL)
+        }
+        
+        let body = LoginRequestBody(email: email, password: password)
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+           request.httpBody = try JSONEncoder().encode(body)
+        } catch {
+           return .failure(.encodingError)
+        }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            
+            guard let loginResponse = try? JSONDecoder().decode(AuthResponse.self, from: data) else {
+                return .failure(.invalidCredentials)
+            }
+            
+            guard let token = loginResponse.token else {
+                return .failure(.invalidCredentials)
+            }
+            
+            return .success(token)
+        } catch {
+            return .failure(.networkError)
+        }
     }
     
     func getUser(token: String) async -> Result<User, AuthenticationError> {
@@ -100,6 +140,37 @@ class NetworkService {
             } else if httpResponse.statusCode == 404 {
                 // User not found
                 return .failure(.userNotFound)
+            } else {
+                // Other error, handle accordingly
+                return .failure(.networkError)
+            }
+        } catch {
+            return .failure(.networkError)
+        }
+    }
+    
+    func fetchCategories(token: String) async -> Result<[Category], AuthenticationError> {
+        // Assuming you have a URL for fetching categories
+        guard let url = URL(string: "http://localhost:8080/categories/all") else {
+            return .failure(.invalidURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("here")
+                return .failure(.networkError)
+            }
+            
+            // Check if the status code indicates success
+            if httpResponse.statusCode == 200 {
+                let categories = try JSONDecoder().decode([Category].self, from: data)
+                return .success(categories)
             } else {
                 // Other error, handle accordingly
                 return .failure(.networkError)

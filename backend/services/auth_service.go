@@ -40,6 +40,8 @@ func (s *AuthService) RegisterUser(ctx context.Context, email, password, usernam
 		return "", err
 	}
 
+	s.UserRepository.CopyPredefinedCategoriesToUser(ctx, user.ID)
+
 	// Generate JWT token with user ID as claim
 	tokenString, err := s.generateToken(user.ID)
 	if err != nil {

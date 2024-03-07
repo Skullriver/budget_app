@@ -18,7 +18,7 @@ struct AuthTextField: View {
     
     @State private var hasTyped = false
     @State private var hasFocus = false
-    
+    @State private var showPass: Bool = false
     
     var body: some View {
         VStack{
@@ -27,13 +27,37 @@ struct AuthTextField: View {
                     .foregroundColor(!prompt.isEmpty ? .red : .text.opacity(0.8))
                     .frame(width: 15, height: 15, alignment: Alignment.center)
                 if isSecure {
-                    SecureField(placeHolder, text: $field, onCommit: {
-                        self.hasTyped = true
-                    })
-                        .font(.system(size: 16).monospaced())
-                        .autocapitalization(.none)
-                        .padding(.vertical, 15)
-                        .padding(.leading, 10)
+                    if showPass {
+                        TextField(placeHolder, text: $field, onCommit: {
+                            self.hasTyped = true
+                        })
+                            .font(.system(size: 16).monospaced())
+                            .autocapitalization(.none)
+                            .padding(.vertical, 15)
+                            .padding(.leading, 10)
+                        Button {
+                            showPass.toggle()
+                        } label: {
+                            Image(systemName: "eye.slash")
+                                .foregroundColor(.text.opacity(0.8))
+                        }
+                    }else{
+                        SecureField(placeHolder, text: $field, onCommit: {
+                            self.hasTyped = true
+                        })
+                            .font(.system(size: 16).monospaced())
+                            .autocapitalization(.none)
+                            .padding(.vertical, 15)
+                            .padding(.leading, 10)
+                        Button {
+                            showPass.toggle()
+                        } label: {
+                            Image(systemName: "eye")
+                                .foregroundColor(.text.opacity(0.8))
+                        }
+                    }
+                    
+
                 }else{
                     TextField(placeHolder, text: $field, onEditingChanged: { editing in
                         self.hasTyped = editing
@@ -42,6 +66,7 @@ struct AuthTextField: View {
                         self.hasFocus = false
                         self.hasTyped = true
                     })
+                        .keyboardType(.emailAddress)
                         .font(.system(size: 16).monospaced())
                         .autocapitalization(.none)
                         .padding(.vertical, 15)
@@ -54,9 +79,11 @@ struct AuthTextField: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 55)
                     .stroke(!prompt.isEmpty ? Color.red : Color.text.opacity(0.8), lineWidth: 1)
+                
             )
+            
             .padding(.bottom, 10)
-            HStack{
+            HStack {
                 if !prompt.isEmpty {
                     Text(prompt)
                         .fixedSize(horizontal: false, vertical: true)
@@ -66,7 +93,6 @@ struct AuthTextField: View {
                 }
             }
             .frame(height: 10)
-            
         }
     }
 }
@@ -76,5 +102,6 @@ struct AuthTextField_Previews: PreviewProvider {
     @State static var txt: String = ""
     static var previews: some View {
         AuthTextField(field: $txt, sfSymbolName: "envelope", placeHolder: "Email", prompt: "test")
+        AuthTextField(field: $txt, sfSymbolName: "envelope", placeHolder: "Email", prompt: "test", isSecure: true)
     }
 }
