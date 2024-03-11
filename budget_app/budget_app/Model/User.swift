@@ -10,4 +10,10 @@ import Foundation
 struct User: Codable {
     let id: Int
     let username: String
+    
+    static var placeholder: User {
+        return User(id: 0, username: "Test")
+    }
 }
+
+

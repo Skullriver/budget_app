@@ -7,15 +7,19 @@
 
 import Foundation
 
-struct Category: Identifiable, Codable {
+struct Category: Identifiable, Codable, Hashable {
     let id: Int
-    let user_id: Int
-    let name: String
-    let icon: String
-    let color: String
+    var user_id: Int
+    var name: String
+    var icon: String
+    var color: String
     
     // Static placeholder property
     static var placeholder: Category {
-        return Category(id: 0, user_id: -1, name: "Placeholder", icon: "questionmark.circle", color: "#FFFFFF")
+        return Category(id: 0, user_id: -1, name: "", icon: "questionmark.circle", color: "#DBF9F0")
+    }
+    
+    static var selectCategory: Category {
+        return Category(id: -1, user_id: -1, name: "", icon: "questionmark.circle", color: "#DBF9F0")
     }
 }

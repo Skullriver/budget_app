@@ -11,6 +11,7 @@ import Foundation
 enum NetworkError: Error {
     case invalidURL
     case invalidData
+    case badResponse(statusCode: Int)
 }
 
 enum AuthenticationError: Error {
@@ -37,6 +38,20 @@ struct AuthResponse: Codable {
     let token: String?
     let message: String?
     let success: Bool?
+}
+
+struct CreateCategoryRequest: Codable {
+    let name: String
+    let icon: String
+    let color: String
+}
+
+struct CreateCategoryResponse: Codable {
+    let categoryID: Int64
+}
+
+struct UpdateCategoryResponse: Codable {
+    let categoryID: Int64
 }
 
 class NetworkService {
@@ -177,6 +192,87 @@ class NetworkService {
             }
         } catch {
             return .failure(.networkError)
+        }
+    }
+    
+    func createCategory(token: String, category: Category) async -> Result<CreateCategoryResponse, Error> {
+        guard let url = URL(string: "http://localhost:8080/categories/create") else {
+            return .failure(NetworkError.invalidURL)
+        }
+        
+        let requestPayload = CreateCategoryRequest(name: category.name, icon: category.icon, color: category.color)
+        
+        do {
+            let requestData = try JSONEncoder().encode(requestPayload)
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.httpBody = requestData
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                // Assuming a 200 OK response indicates success
+                // Adjust according to your backend's API contract
+                return .failure(NetworkError.badResponse(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1))
+            }
+            
+            // Decode the response to get the newly created category's ID
+            let decodedResponse = try JSONDecoder().decode(CreateCategoryResponse.self, from: data)
+            return .success(decodedResponse)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func updateCategory(token: String, category: Category) async -> Result<UpdateCategoryResponse, Error> {
+        guard let url = URL(string: "http://localhost:8080/categories/update") else {
+            return .failure(NetworkError.invalidURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let categoryData = try JSONEncoder().encode(category)
+            request.httpBody = categoryData
+        } catch {
+            return .failure(error)
+        }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let updateResponse = try JSONDecoder().decode(UpdateCategoryResponse.self, from: data)
+            return .success(updateResponse)
+        } catch {
+            return .failure(error)
+        }
+    }
+    func deleteCategory(token: String, categoryId: Int) async -> Result<Void, Error> {
+        guard let url = URL(string: "http://localhost:8080/categories/delete/\(categoryId)") else {
+            return .failure(NetworkError.invalidURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                // Assuming a 200 OK response indicates success
+                // Adjust according to your backend's API contract
+                return .failure(NetworkError.badResponse(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1))
+            }
+            
+            // Optionally, decode the response if your API provides a response body for DELETE requests
+            // For this example, we'll assume success if we get a 200 OK response without decoding the response body
+            return .success(())
+        } catch {
+            return .failure(error)
         }
     }
 }

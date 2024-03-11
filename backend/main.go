@@ -68,7 +68,7 @@ func main() {
 	postgresPass := os.Getenv("DB_PASS")
 	postgresName := os.Getenv("DB_NAME")
 
-	db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", postgresHost, postgresUser, postgresPass, postgresName))
+	db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=5433 user=%s password=%s dbname=%s sslmode=disable", postgresHost, postgresUser, postgresPass, postgresName))
 	if err != nil {
 		log.Fatal(err)
 	}

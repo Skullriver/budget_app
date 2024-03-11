@@ -51,7 +51,7 @@ func (r *postgresCategoryRepository) GetCategoryByID(ctx context.Context, id int
 }
 
 func (r *postgresCategoryRepository) GetCategoriesByUserID(ctx context.Context, id int64) ([]*models.Category, error) {
-	query := "SELECT id, userid, name, iconcode, colorcode FROM categories WHERE userid = $1 ORDER BY id"
+	query := "SELECT id, userid, name, iconcode, colorcode FROM categories WHERE userid = $1 ORDER BY name"
 	rows, err := r.db.QueryContext(ctx, query, id)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (r *postgresCategoryRepository) GetCategoriesByUserID(ctx context.Context, 
 
 func (r *postgresCategoryRepository) UpdateCategory(ctx context.Context, category *models.Category) error {
 	query := "UPDATE categories SET name = $1, iconcode = $2, colorcode = $3 WHERE id = $4"
-	_, err := r.db.ExecContext(ctx, query, category.Name, category.Icon, category.Color)
+	_, err := r.db.ExecContext(ctx, query, category.Name, category.Icon, category.Color, category.ID)
 	if err != nil {
 		return fmt.Errorf("failed to update category: %v", err)
 	}

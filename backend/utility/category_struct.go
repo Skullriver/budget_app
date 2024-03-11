@@ -10,10 +10,11 @@ type CreateCategoryResponse struct {
 }
 
 type UpdateCategoryRequest struct {
-	ID    int64  `json:"id"`
-	Name  string `json:"name,omitempty"`
-	Icon  string `json:"icon,omitempty"`
-	Color string `json:"color,omitempty"`
+	ID     int64  `json:"id"`
+	UserID int64  `json:"user_id,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Icon   string `json:"icon,omitempty"`
+	Color  string `json:"color,omitempty"`
 }
 
 type UpdateCategoryResponse struct {

@@ -12,12 +12,16 @@ struct budget_appApp: App {
 
     @StateObject var viewModel = AuthViewModel()
     @StateObject var tabViewModel = TabViewModel()
+    @StateObject var transactionViewModel = AddTransactionViewModel()
+    @StateObject var categoryViewModel = CategoriesViewModel()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(viewModel)
                 .environmentObject(tabViewModel)
+                .environmentObject(transactionViewModel)
+                .environmentObject(categoryViewModel)
         }
     }
 }

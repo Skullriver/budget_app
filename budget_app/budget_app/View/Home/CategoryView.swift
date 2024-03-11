@@ -11,8 +11,11 @@ struct CategoryView: View {
     
     @Environment(\.dismiss) private var dismiss
     
-    @StateObject private var viewModel = CategoriesViewModel()
+    @EnvironmentObject var viewModel: CategoriesViewModel
+    
     @State private var isPresented: Bool = false
+    @State private var showingDeleteConfirmation = false
+    @State private var categoryToDelete: Category?
     
     @State private var showingActionSheet = false
     @State private var selectedCategory: Category?
@@ -22,7 +25,6 @@ struct CategoryView: View {
         NavigationStack{
             VStack{
                 //fetch categories here
-                
                 if viewModel.isLoading {
                     ProgressView()
                 }else{
@@ -53,14 +55,14 @@ struct CategoryView: View {
                             self.showingActionSheet = true
                         }
                         .listRowBackground(Color.clear)
+                        
                     }
                     .scrollContentBackground(.hidden)
                     .actionSheet(isPresented: $showingActionSheet) {
                         actionSheet(for: selectedCategory)
                     }
                     .fullScreenCover(isPresented: $navigateToEditView) {
-                        // Present your CategoryView here
-                        EditCategoryView(category: selectedCategory ?? Category.placeholder)
+                        CategoryDetailView(category: selectedCategory, isNewCategory: false)
                     }
                 }
                 
@@ -91,17 +93,26 @@ struct CategoryView: View {
             }
             .background(Color.background)
             .sheet(isPresented: $isPresented) {
-                AddCategoryView()
+                CategoryDetailView(isNewCategory: true)
+            }
+            .alert("Confirm Delete", isPresented: $showingDeleteConfirmation) {
+                Button("Cancel Delete", role: .cancel) {}
+                Button("Delete", role: .destructive) {
+                    if let categoryToDelete = categoryToDelete {
+                        Task {
+                            await viewModel.deleteCategory(categoryToDelete.id)
+                        }
+                    }
+                }
+            } message: {
+                Text("Are you sure you want to delete this category?")
             }
         }
-        .navigationBarBackButtonHidden(true)
         .onAppear {
-//            tabViewModel.isTabBarVisible = false
             Task {
                 await viewModel.fetchCategories()
             }
         }
-        
     }
     
     func actionSheet(for category: Category?) -> ActionSheet {
@@ -109,12 +120,45 @@ struct CategoryView: View {
             .default(Text("Edit")) { 
                 self.navigateToEditView = true
             },
-            .destructive(Text("Delete")) { /* Handle Delete Action */ },
+            .destructive(Text("Delete")) {
+                self.categoryToDelete = category
+                self.showingDeleteConfirmation = true
+            },
             .cancel()
         ])
     }
 }
 
-#Preview {
-    CategoryView()
+struct CategoryView_Previews: PreviewProvider {
+    
+    static let viewModel: CategoriesViewModel = {
+            let vm = CategoriesViewModel()
+            vm.categories = [
+                Category(id: 1, user_id: -1, name: "Groceries", icon: "cart", color: "#FF0000"),
+                Category(id: 2, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 3, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 4, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 5, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+                Category(id: 6, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
+            ]
+            return vm
+    }()
+    
+    static var previews: some View {
+            // Instantiate CategoryView normally
+        
+        CategoryView().environmentObject(viewModel)
+
+            
+        }
 }

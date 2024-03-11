@@ -9,6 +9,8 @@ import SwiftUI
 
 struct TabBarView: View {
     
+    @EnvironmentObject var transactionViewModel: AddTransactionViewModel
+    
     @Binding var tabSelection: Int
     
     var body: some View {
@@ -109,7 +111,7 @@ struct TabBarView: View {
             .frame(height: 65)
             
             Button{
-                
+                transactionViewModel.isNewTransactionVisible.toggle()
             }label: {
                 Image("plus")
                     .resizable()

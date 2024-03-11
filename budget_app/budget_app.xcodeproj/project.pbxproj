@@ -20,10 +20,8 @@
 		9821BBEE2B98C1B0000EADA5 /* CategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9821BBED2B98C1B0000EADA5 /* CategoryView.swift */; };
 		9821BBF32B98C957000EADA5 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9821BBF22B98C957000EADA5 /* Persistence.swift */; };
 		9821BBF52B99331D000EADA5 /* SecondaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9821BBF42B99331D000EADA5 /* SecondaryButton.swift */; };
-		9821BBF72B993435000EADA5 /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9821BBF62B993435000EADA5 /* AddCategoryView.swift */; };
 		9821BBF92B9937F9000EADA5 /* CategoriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9821BBF82B9937F9000EADA5 /* CategoriesViewModel.swift */; };
 		9821BBFB2B99494C000EADA5 /* TabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9821BBFA2B99494C000EADA5 /* TabViewModel.swift */; };
-		9821BBFD2B9954A5000EADA5 /* EditCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9821BBFC2B9954A5000EADA5 /* EditCategoryView.swift */; };
 		98414A792B94D62400AA325D /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98414A782B94D62400AA325D /* MainTabView.swift */; };
 		98414A832B94F4BA00AA325D /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98414A822B94F4BA00AA325D /* TabBarView.swift */; };
 		98414A852B94F61600AA325D /* BudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98414A842B94F61600AA325D /* BudgetView.swift */; };
@@ -42,8 +40,10 @@
 		98C9476C2B8B5BDC00D8FC52 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98C9476B2B8B5BDC00D8FC52 /* WelcomeView.swift */; };
 		98C9476E2B8B5BFC00D8FC52 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98C9476D2B8B5BFC00D8FC52 /* LoginView.swift */; };
 		98C947702B8B73C300D8FC52 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98C9476F2B8B73C300D8FC52 /* SignUpView.swift */; };
+		98D86F902B9B0CF5003D82A1 /* AddTransactionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D86F8F2B9B0CF5003D82A1 /* AddTransactionViewModel.swift */; };
 		98FCECC52B91CC6B006D500F /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98FCECC42B91CC6B006D500F /* SignUpViewModel.swift */; };
 		98FCECC72B91DBFB006D500F /* AuthTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98FCECC62B91DBFB006D500F /* AuthTextField.swift */; };
+		98FE5AEA2B9F9E7E00C2A4AA /* CategoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98FE5AE92B9F9E7E00C2A4AA /* CategoryDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,10 +80,8 @@
 		9821BBED2B98C1B0000EADA5 /* CategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryView.swift; sourceTree = "<group>"; };
 		9821BBF22B98C957000EADA5 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		9821BBF42B99331D000EADA5 /* SecondaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButton.swift; sourceTree = "<group>"; };
-		9821BBF62B993435000EADA5 /* AddCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoryView.swift; sourceTree = "<group>"; };
 		9821BBF82B9937F9000EADA5 /* CategoriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewModel.swift; sourceTree = "<group>"; };
 		9821BBFA2B99494C000EADA5 /* TabViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewModel.swift; sourceTree = "<group>"; };
-		9821BBFC2B9954A5000EADA5 /* EditCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryView.swift; sourceTree = "<group>"; };
 		98414A782B94D62400AA325D /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		98414A822B94F4BA00AA325D /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		98414A842B94F61600AA325D /* BudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
@@ -102,8 +100,10 @@
 		98C9476B2B8B5BDC00D8FC52 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		98C9476D2B8B5BFC00D8FC52 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		98C9476F2B8B73C300D8FC52 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		98D86F8F2B9B0CF5003D82A1 /* AddTransactionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionViewModel.swift; sourceTree = "<group>"; };
 		98FCECC42B91CC6B006D500F /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
 		98FCECC62B91DBFB006D500F /* AuthTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTextField.swift; sourceTree = "<group>"; };
+		98FE5AE92B9F9E7E00C2A4AA /* CategoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -227,6 +227,7 @@
 				98FCECC42B91CC6B006D500F /* SignUpViewModel.swift */,
 				9821BBF82B9937F9000EADA5 /* CategoriesViewModel.swift */,
 				9821BBFA2B99494C000EADA5 /* TabViewModel.swift */,
+				98D86F8F2B9B0CF5003D82A1 /* AddTransactionViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -282,8 +283,7 @@
 				98414A882B94F7F100AA325D /* WalletsView.swift */,
 				98414A8A2B950A5F00AA325D /* AddTransactionView.swift */,
 				9821BBED2B98C1B0000EADA5 /* CategoryView.swift */,
-				9821BBF62B993435000EADA5 /* AddCategoryView.swift */,
-				9821BBFC2B9954A5000EADA5 /* EditCategoryView.swift */,
+				98FE5AE92B9F9E7E00C2A4AA /* CategoryDetailView.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -432,6 +432,7 @@
 				98FCECC72B91DBFB006D500F /* AuthTextField.swift in Sources */,
 				98C947702B8B73C300D8FC52 /* SignUpView.swift in Sources */,
 				98C947622B8A944700D8FC52 /* Category.swift in Sources */,
+				98FE5AEA2B9F9E7E00C2A4AA /* CategoryDetailView.swift in Sources */,
 				98C9475A2B8A91E800D8FC52 /* Wallet.swift in Sources */,
 				98414A872B94F7C400AA325D /* TransactionsView.swift in Sources */,
 				98C9475E2B8A93CB00D8FC52 /* Income.swift in Sources */,
@@ -443,11 +444,10 @@
 				98414A792B94D62400AA325D /* MainTabView.swift in Sources */,
 				98414A832B94F4BA00AA325D /* TabBarView.swift in Sources */,
 				98C9476C2B8B5BDC00D8FC52 /* WelcomeView.swift in Sources */,
-				9821BBFD2B9954A5000EADA5 /* EditCategoryView.swift in Sources */,
+				98D86F902B9B0CF5003D82A1 /* AddTransactionViewModel.swift in Sources */,
 				9821BBF32B98C957000EADA5 /* Persistence.swift in Sources */,
 				98C9476E2B8B5BFC00D8FC52 /* LoginView.swift in Sources */,
 				9821BBFB2B99494C000EADA5 /* TabViewModel.swift in Sources */,
-				9821BBF72B993435000EADA5 /* AddCategoryView.swift in Sources */,
 				9803D0662B8F72D600F9369C /* DashboardView.swift in Sources */,
 				9803D0642B8F673E00F9369C /* NetworkService.swift in Sources */,
 				98414A892B94F7F100AA325D /* WalletsView.swift in Sources */,
