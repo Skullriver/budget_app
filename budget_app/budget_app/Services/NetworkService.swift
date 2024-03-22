@@ -54,6 +54,22 @@ struct UpdateCategoryResponse: Codable {
     let categoryID: Int64
 }
 
+struct CreateWalletRequest: Codable {
+    let name: String
+    let currency: String
+    let initial_balance: Int
+    let icon: String
+    let color: String
+}
+
+struct CreateWalletResponse: Codable {
+    let walletID: Int64
+}
+
+struct UpdateWalletResponse: Codable {
+    let walletID: Int64
+}
+
 class NetworkService {
     static let shared = NetworkService()
     
@@ -252,6 +268,125 @@ class NetworkService {
     }
     func deleteCategory(token: String, categoryId: Int) async -> Result<Void, Error> {
         guard let url = URL(string: "http://localhost:8080/categories/delete/\(categoryId)") else {
+            return .failure(NetworkError.invalidURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                // Assuming a 200 OK response indicates success
+                // Adjust according to your backend's API contract
+                return .failure(NetworkError.badResponse(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1))
+            }
+            
+            // Optionally, decode the response if your API provides a response body for DELETE requests
+            // For this example, we'll assume success if we get a 200 OK response without decoding the response body
+            return .success(())
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func fetchWallets(token: String) async -> Result<[Wallet], AuthenticationError> {
+        // Assuming you have a URL for fetching categories
+        guard let url = URL(string: "http://localhost:8080/wallets/all") else {
+            return .failure(.invalidURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return .failure(.networkError)
+            }
+            
+            // Check if the status code indicates success
+            if httpResponse.statusCode == 200 {
+                let wallets = try JSONDecoder().decode([Wallet].self, from: data)
+                print(data)
+                return .success(wallets)
+            } else {
+                // Other error, handle accordingly
+                return .failure(.networkError)
+            }
+        } catch {
+            return .failure(.networkError)
+        }
+    }
+    
+    func createWallet(token: String, wallet: Wallet) async -> Result<CreateWalletResponse, Error> {
+        guard let url = URL(string: "http://localhost:8080/wallets/create") else {
+            return .failure(NetworkError.invalidURL)
+        }
+        
+        let requestPayload = CreateWalletRequest(
+            name: wallet.name,
+            currency: wallet.currency,
+            initial_balance: wallet.initialBalance,
+            icon: wallet.iconCode,
+            color: wallet.colorCode
+        )
+        
+        do {
+            let requestData = try JSONEncoder().encode(requestPayload)
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.httpBody = requestData
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                // Assuming a 200 OK response indicates success
+                // Adjust according to your backend's API contract
+                return .failure(NetworkError.badResponse(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1))
+            }
+            
+            // Decode the response to get the newly created category's ID
+            let decodedResponse = try JSONDecoder().decode(CreateWalletResponse.self, from: data)
+            return .success(decodedResponse)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func updateWallet(token: String, wallet: Wallet) async -> Result<UpdateWalletResponse, Error> {
+        guard let url = URL(string: "http://localhost:8080/wallets/update") else {
+            return .failure(NetworkError.invalidURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let walletData = try JSONEncoder().encode(wallet)
+            request.httpBody = walletData
+        } catch {
+            return .failure(error)
+        }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let updateResponse = try JSONDecoder().decode(UpdateWalletResponse.self, from: data)
+            return .success(updateResponse)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func deleteWallet(token: String, walletId: Int) async -> Result<Void, Error> {
+        guard let url = URL(string: "http://localhost:8080/wallets/delete/\(walletId)") else {
             return .failure(NetworkError.invalidURL)
         }
         

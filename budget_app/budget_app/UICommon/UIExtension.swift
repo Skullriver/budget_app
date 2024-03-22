@@ -71,6 +71,25 @@ extension View {
     }
 }
 
+let currencySymbols: [String: String] = [
+    "USD": "$", // US Dollar
+    "EUR": "€", // Euro
+    "GBP": "£", // British Pound
+    "JPY": "¥", // Japanese Yen
+    // Add more currencies and their symbols as needed
+]
+
+extension Float {
+    func formattedCurrency(withCurrencyCode code: String) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = code
+        if let customSymbol = currencySymbols[code] {
+            formatter.currencySymbol = customSymbol
+        }
+        return formatter.string(from: NSNumber(value: self)) ?? "\(self)"
+    }
+}
 extension NumberFormatter {
     
     static var currency: NumberFormatter {
@@ -126,5 +145,19 @@ extension Color {
         } else {
             return String(format: "#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255))
         }
+    }
+    
+    var isLight: Bool {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        
+        // Convert Color to UIColor (required for extraction of RGBA components)
+        UIColor(self).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        // Algorithm to determine if color is light
+        let brightness = (red * 299 + green * 587 + blue * 114) / 1000
+        return brightness > 0.5
     }
 }

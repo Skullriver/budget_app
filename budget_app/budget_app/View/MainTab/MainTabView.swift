@@ -23,7 +23,7 @@ struct MainTabView: View {
             TransactionsView()
                 .tag(2)
             
-            TransactionsView()
+            WalletView()
                 .tag(3)
         }
         .overlay(alignment: .bottom) {

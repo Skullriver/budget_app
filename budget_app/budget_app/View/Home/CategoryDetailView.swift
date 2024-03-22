@@ -17,7 +17,6 @@ struct CategoryDetailView: View {
     var isNewCategory: Bool
     var category: Category?
     
-    
     // If adding a new category, use a temporary in-memory category object
     @State private var editableCategory: Category
 

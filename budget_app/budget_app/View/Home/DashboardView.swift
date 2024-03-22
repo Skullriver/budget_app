@@ -101,7 +101,7 @@ struct DashboardView_Previews: PreviewProvider {
         DashboardView()
             .environmentObject(viewModel)
             .environmentObject(transactionViewModel)
-            
+            .environmentObject(CategoriesViewModel())
         }
 }
 

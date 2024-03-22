@@ -47,6 +47,7 @@ func setupRoutes(db *sql.DB) *mux.Router {
 
 	authHandler := handlers.NewAuthHandler(db, "my-secret-token")
 	categoryHandler := handlers.NewCategoryHandler(db, "my-secret-token")
+	walletHandler := handlers.NewWalletHandler(db, "my-secret-token")
 
 	r.HandleFunc("/user/register", authHandler.RegisterHandler).Methods("POST", "OPTIONS")
 	r.HandleFunc("/user/login", authHandler.LoginHandler).Methods("POST", "OPTIONS")
@@ -58,6 +59,11 @@ func setupRoutes(db *sql.DB) *mux.Router {
 	r.HandleFunc("/categories/get/{id}", categoryHandler.GetCategoryHandler).Methods("GET", "OPTIONS")
 	r.HandleFunc("/categories/all", categoryHandler.GetAllCategoriesHandler).Methods("GET", "OPTIONS")
 
+	r.HandleFunc("/wallets/create", walletHandler.CreateWalletHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/wallets/update", walletHandler.UpdateWalletHandler).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/wallets/delete/{id}", walletHandler.DeleteWalletHandler).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/wallets/get/{id}", walletHandler.GetWalletHandler).Methods("GET", "OPTIONS")
+	r.HandleFunc("/wallets/all", walletHandler.GetAllWalletsHandler).Methods("GET", "OPTIONS")
 	return r
 }
 

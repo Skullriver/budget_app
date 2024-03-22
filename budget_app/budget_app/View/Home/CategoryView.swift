@@ -22,7 +22,7 @@ struct CategoryView: View {
     @State private var navigateToEditView = false
     
     var body: some View {
-        NavigationStack{
+        NavigationView{
             VStack{
                 //fetch categories here
                 if viewModel.isLoading {
@@ -46,6 +46,9 @@ struct CategoryView: View {
                             Text(category.name)
                                 .foregroundColor(.text)
                                 .font(.system(.callout).monospaced().bold())
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
 
                         }
                         .padding(.vertical, 7)
@@ -57,6 +60,7 @@ struct CategoryView: View {
                         .listRowBackground(Color.clear)
                         
                     }
+                    .listStyle(PlainListStyle())
                     .scrollContentBackground(.hidden)
                     .actionSheet(isPresented: $showingActionSheet) {
                         actionSheet(for: selectedCategory)
@@ -65,6 +69,7 @@ struct CategoryView: View {
                         CategoryDetailView(category: selectedCategory, isNewCategory: false)
                     }
                 }
+            
                 
                 //Add new category
                 Button{
@@ -74,6 +79,7 @@ struct CategoryView: View {
                 }
                 Spacer()
             }
+            .padding(.top, 15)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -87,10 +93,11 @@ struct CategoryView: View {
                     VStack {
                         Text("Categories")
                             .font(.system(size: 20).monospaced().bold())
-                          .foregroundColor(Color.text)
+                            .foregroundColor(Color.text)
                     }
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
             .background(Color.background)
             .sheet(isPresented: $isPresented) {
                 CategoryDetailView(isNewCategory: true)

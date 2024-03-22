@@ -7,14 +7,18 @@
 
 import Foundation
 
-struct Wallet: Codable {
-    let id: Int
-    let userID: Int
-    let name: String
-    let currency: String
-    let initialBalance: Float
-    let balance: Float
-    let iconCode: String
-    let colorCode: String
-    let createdAt: Date
+struct Wallet: Identifiable, Codable, Hashable {
+    var id: Int
+    var userID: Int
+    var name: String
+    var currency: String
+    var initialBalance: Int
+    var balance: Int
+    var iconCode: String
+    var colorCode: String
+    var createdAt: String
+    
+    static var placeholder: Wallet {
+        return Wallet(id: 0, userID: 0, name: "", currency: "USD", initialBalance: 0, balance:0, iconCode: "questionmark.circle", colorCode: "#DBF9F0", createdAt: "")
+    }
 }

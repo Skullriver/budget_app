@@ -13,6 +13,7 @@ public struct CurrencyField: View {
     var formatter: NumberFormatter
 
     private var label: String {
+        formatter.decimalSeparator = "."
         let mag = pow(10, formatter.maximumFractionDigits)
         return formatter.string(for: Decimal(value) / mag) ?? ""
     }
@@ -24,7 +25,7 @@ public struct CurrencyField: View {
 
     public init(value: Binding<Int>) {
         let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
+//        formatter.numberStyle = .currency
         formatter.minimumFractionDigits = 2
         formatter.maximumFractionDigits = 2
 
@@ -37,7 +38,13 @@ public struct CurrencyField: View {
         ZStack {
             // Text view to display the formatted currency
             // Set as priority so CurrencyInputField size doesn't affect parent
-            Text(label).layoutPriority(1)
+            Text(label)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(RoundedRectangle(cornerRadius: 15).fill(Color.white)) // Background color to match input field
+                .overlay(RoundedRectangle(cornerRadius: 15.0).stroke(Color.clear, lineWidth: 1))
+                
+                .layoutPriority(1)
 
             // Input text field to handle UI
             CurrencyInputField(value: $value, formatter: formatter)

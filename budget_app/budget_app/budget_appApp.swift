@@ -14,6 +14,7 @@ struct budget_appApp: App {
     @StateObject var tabViewModel = TabViewModel()
     @StateObject var transactionViewModel = AddTransactionViewModel()
     @StateObject var categoryViewModel = CategoriesViewModel()
+    @StateObject var walletsViewModel = WalletsViewModel()
 
     var body: some Scene {
         WindowGroup {
@@ -22,6 +23,7 @@ struct budget_appApp: App {
                 .environmentObject(tabViewModel)
                 .environmentObject(transactionViewModel)
                 .environmentObject(categoryViewModel)
+                .environmentObject(walletsViewModel)
         }
     }
 }
