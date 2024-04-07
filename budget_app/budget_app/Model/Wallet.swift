@@ -19,6 +19,12 @@ struct Wallet: Identifiable, Codable, Hashable {
     var createdAt: String
     
     static var placeholder: Wallet {
-        return Wallet(id: 0, userID: 0, name: "", currency: "USD", initialBalance: 0, balance:0, iconCode: "questionmark.circle", colorCode: "#DBF9F0", createdAt: "")
+        return Wallet(id: -1, userID: -1, name: "Select wallet", currency: "USD", initialBalance: 0, balance:0, iconCode: "questionmark.circle", colorCode: "#DBF9F0", createdAt: "")
     }
+}
+
+struct WalletStatistics: Identifiable, Codable {
+    var id: Int
+    let totalIncome: Int
+    let totalExpenses: Int
 }

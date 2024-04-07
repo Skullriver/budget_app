@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TabBarView: View {
     
-    @EnvironmentObject var transactionViewModel: AddTransactionViewModel
+    @EnvironmentObject var transactionViewModel: TransactionViewModel
     
     @Binding var tabSelection: Int
     

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import Foundation
 
 extension CGFloat {
     
@@ -160,4 +161,29 @@ extension Color {
         let brightness = (red * 299 + green * 587 + blue * 114) / 1000
         return brightness > 0.5
     }
+}
+
+extension ContentView {
+    func formattedDate(from dateString: String) -> String {
+        let isoDateFormatter = ISO8601DateFormatter()
+        isoDateFormatter.formatOptions = [.withFullDate, .withTime, .withDashSeparatorInDate, .withColonSeparatorInTime]
+
+        let displayDateFormatter = DateFormatter()
+        displayDateFormatter.dateFormat = "dd MMMM" // Adjust format as needed
+        displayDateFormatter.locale = Locale(identifier: "fr_FR") // For French month names
+
+        if let date = isoDateFormatter.date(from: dateString) {
+            return displayDateFormatter.string(from: date)
+        } else {
+            return "Invalid date"
+        }
+    }
+}
+
+extension DateFormatter {
+    static let monthYear: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter
+    }()
 }

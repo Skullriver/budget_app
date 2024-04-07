@@ -28,7 +28,7 @@ struct CategoryView: View {
                 if viewModel.isLoading {
                     ProgressView()
                 }else{
-                    List(viewModel.categories) { category in
+                    List(viewModel.displayableCategories) { category in
                         HStack {
                             ZStack {
                                 Circle()
@@ -140,7 +140,7 @@ struct CategoryView_Previews: PreviewProvider {
     
     static let viewModel: CategoriesViewModel = {
             let vm = CategoriesViewModel()
-            vm.categories = [
+            vm.displayableCategories = [
                 Category(id: 1, user_id: -1, name: "Groceries", icon: "cart", color: "#FF0000"),
                 Category(id: 2, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),
                 Category(id: 3, user_id: -1, name: "Utilities", icon: "bolt.fill", color: "#00FF00"),

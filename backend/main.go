@@ -48,6 +48,7 @@ func setupRoutes(db *sql.DB) *mux.Router {
 	authHandler := handlers.NewAuthHandler(db, "my-secret-token")
 	categoryHandler := handlers.NewCategoryHandler(db, "my-secret-token")
 	walletHandler := handlers.NewWalletHandler(db, "my-secret-token")
+	transactionHandler := handlers.NewTransactionHandler(db, "my-secret-token")
 
 	r.HandleFunc("/user/register", authHandler.RegisterHandler).Methods("POST", "OPTIONS")
 	r.HandleFunc("/user/login", authHandler.LoginHandler).Methods("POST", "OPTIONS")
@@ -64,6 +65,29 @@ func setupRoutes(db *sql.DB) *mux.Router {
 	r.HandleFunc("/wallets/delete/{id}", walletHandler.DeleteWalletHandler).Methods("DELETE", "OPTIONS")
 	r.HandleFunc("/wallets/get/{id}", walletHandler.GetWalletHandler).Methods("GET", "OPTIONS")
 	r.HandleFunc("/wallets/all", walletHandler.GetAllWalletsHandler).Methods("GET", "OPTIONS")
+
+	r.HandleFunc("/transactions/income/create", transactionHandler.CreateIncomeHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/transactions/income/update", transactionHandler.UpdateIncomeHandler).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/transactions/income/delete/{id}", transactionHandler.DeleteIncomeHandler).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/transactions/income/get/{id}", transactionHandler.GetIncomeHandler).Methods("GET", "OPTIONS")
+	r.HandleFunc("/transactions/income/all", transactionHandler.GetAllIncomesHandler).Methods("GET", "OPTIONS")
+
+	r.HandleFunc("/transactions/expense/create", transactionHandler.CreateExpenseHandler).Methods("POST", "OPTIONS")
+	//r.HandleFunc("/transactions/expense/update", transactionHandler.UpdateExpenseHandler).Methods("PUT", "OPTIONS")
+	//r.HandleFunc("/transactions/expense/delete/{id}", transactionHandler.DeleteExpenseHandler).Methods("DELETE", "OPTIONS")
+	//r.HandleFunc("/transactions/expense/get/{id}", transactionHandler.GetExpenseHandler).Methods("GET", "OPTIONS")
+	//r.HandleFunc("/transactions/expense/all", transactionHandler.GetAllExpensesHandler).Methods("GET", "OPTIONS")
+
+	r.HandleFunc("/transactions/transfer/create", transactionHandler.CreateTransferHandler).Methods("POST", "OPTIONS")
+	//r.HandleFunc("/transactions/expense/update", transactionHandler.UpdateExpenseHandler).Methods("PUT", "OPTIONS")
+	//r.HandleFunc("/transactions/expense/delete/{id}", transactionHandler.DeleteExpenseHandler).Methods("DELETE", "OPTIONS")
+	//r.HandleFunc("/transactions/expense/get/{id}", transactionHandler.GetExpenseHandler).Methods("GET", "OPTIONS")
+	//r.HandleFunc("/transactions/expense/all", transactionHandler.GetAllExpensesHandler).Methods("GET", "OPTIONS")
+
+	r.HandleFunc("/transactions/all", transactionHandler.GetAllTransactionsHandler).Methods("GET", "OPTIONS")
+	r.HandleFunc("/transactions/statistics", transactionHandler.GetAllTransactionsStatisticsHandler).Methods("GET", "OPTIONS")
+	r.HandleFunc("/wallet/statistics", transactionHandler.GetWalletStatisticsHandler).Methods("GET", "OPTIONS")
+
 	return r
 }
 

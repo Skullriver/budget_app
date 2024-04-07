@@ -66,6 +66,7 @@ class AuthViewModel: ObservableObject {
             switch await NetworkService.shared.getUser(token: token) {
                 case .success(let user):
                     self.currentUser = user
+                
                 case .failure(let error):
                     self.userSession = nil
                     print("Error fetching user: \(error.localizedDescription)")

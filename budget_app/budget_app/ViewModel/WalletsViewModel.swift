@@ -10,11 +10,33 @@ import Foundation
 @MainActor
 class WalletsViewModel: ObservableObject {
     
-    @Published var wallets: [Wallet] = []
+    @Published var wallets: [Wallet] = [.placeholder]
+    @Published var displayableWallets: [Wallet] = []
     @Published var isLoading = false
+    
+    @Published var walletStatistics: WalletStatistics?
     
     private var userSession: String? {
         AuthViewModel.shared.userSession
+    }
+    
+    func fetchWalletStatistics(walletID: Int) async {
+        if let token = self.userSession {
+            isLoading = true
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM" // Format to filter by month
+            let monthString = formatter.string(from: Date())
+            
+            switch await NetworkService.shared.fetchWalletStatistics(token: token, walletID: walletID, month: monthString) {
+                case .success(let stats):
+                    isLoading = false
+                    self.walletStatistics = stats
+                case .failure(let error):
+                    isLoading = false
+                    print("Error fetching wallet statistics: \(error.localizedDescription)")
+            }
+        
+        }
     }
     
     func fetchWallets() async {
@@ -23,7 +45,9 @@ class WalletsViewModel: ObservableObject {
             switch await NetworkService.shared.fetchWallets(token: token) {
                 case .success(let wallets):
                     isLoading = false
-                    self.wallets = wallets
+                    self.wallets = [.placeholder]
+                    self.displayableWallets = wallets
+                    self.wallets.append(contentsOf: wallets)
                 case .failure(let error):
                     isLoading = false
                     print("Error fetching wallets: \(error.localizedDescription)")

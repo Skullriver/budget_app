@@ -12,7 +12,7 @@ struct budget_appApp: App {
 
     @StateObject var viewModel = AuthViewModel()
     @StateObject var tabViewModel = TabViewModel()
-    @StateObject var transactionViewModel = AddTransactionViewModel()
+    @StateObject var transactionViewModel = TransactionViewModel()
     @StateObject var categoryViewModel = CategoriesViewModel()
     @StateObject var walletsViewModel = WalletsViewModel()
 

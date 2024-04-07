@@ -70,6 +70,18 @@ struct UpdateWalletResponse: Codable {
     let walletID: Int64
 }
 
+struct CreateIncomeResponse: Codable {
+    let incomeID: Int64
+}
+
+struct CreateExpenseResponse: Codable {
+    let expenseID: Int64
+}
+
+struct CreateTransferResponse: Codable {
+    let transferID: Int64
+}
+
 class NetworkService {
     static let shared = NetworkService()
     
@@ -406,6 +418,180 @@ class NetworkService {
             // Optionally, decode the response if your API provides a response body for DELETE requests
             // For this example, we'll assume success if we get a 200 OK response without decoding the response body
             return .success(())
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func fetchTransactions(token: String) async -> Result<[Transaction], Error> {
+        let url = URL(string: "http://localhost:8080/transactions/all")! // Use your actual endpoint
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            if let json = String(data: data, encoding: .utf8) {
+                    print("JSON String: \(json)")
+                }
+            // Decode using JSONDecoder and a custom decoding strategy
+            let decoder = JSONDecoder()
+            // Assuming the backend structure is known and can be decoded into [Transaction]
+            let transactions = try decoder.decode([Transaction].self, from: data)
+            return .success(transactions)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func createIncome(token: String, requestData: Data) async -> Result<CreateIncomeResponse, Error> {
+        guard let url = URL(string: "http://localhost:8080/transactions/income/create") else {
+            return .failure(NetworkError.invalidURL)
+        }
+        
+        do {
+    
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.httpBody = requestData
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                // Assuming a 200 OK response indicates success
+                // Adjust according to your backend's API contract
+                return .failure(NetworkError.badResponse(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1))
+            }
+            
+            // Decode the response to get the newly created category's ID
+            let decodedResponse = try JSONDecoder().decode(CreateIncomeResponse.self, from: data)
+            return .success(decodedResponse)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func createExpense(token: String, requestData: Data) async -> Result<CreateExpenseResponse, Error> {
+        guard let url = URL(string: "http://localhost:8080/transactions/expense/create") else {
+            return .failure(NetworkError.invalidURL)
+        }
+        
+        do {
+    
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.httpBody = requestData
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                // Assuming a 200 OK response indicates success
+                // Adjust according to your backend's API contract
+                return .failure(NetworkError.badResponse(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1))
+            }
+            
+            // Decode the response to get the newly created category's ID
+            let decodedResponse = try JSONDecoder().decode(CreateExpenseResponse.self, from: data)
+            return .success(decodedResponse)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func createTransfer(token: String, requestData: Data) async -> Result<CreateTransferResponse, Error> {
+        guard let url = URL(string: "http://localhost:8080/transactions/transfer/create") else {
+            return .failure(NetworkError.invalidURL)
+        }
+        
+        do {
+    
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.httpBody = requestData
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                // Assuming a 200 OK response indicates success
+                // Adjust according to your backend's API contract
+                return .failure(NetworkError.badResponse(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1))
+            }
+            
+            // Decode the response to get the newly created category's ID
+            let decodedResponse = try JSONDecoder().decode(CreateTransferResponse.self, from: data)
+            return .success(decodedResponse)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func fetchStatistics(token: String, walletID: Int, month: String, type: String) async -> Result<[CategoryStatistic], Error> {
+        guard let url = URL(string: "http://localhost:8080/transactions/statistics") else {
+            return .failure(NSError(domain: "InvalidURL", code: -1, userInfo: nil))
+        }
+        
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        components?.queryItems = [
+            URLQueryItem(name: "walletID", value: String(walletID)),
+            URLQueryItem(name: "month", value: month),
+            URLQueryItem(name: "type", value: type)
+        ]
+        
+        guard let finalURL = components?.url else {
+            return .failure(NSError(domain: "InvalidURLComponents", code: -2, userInfo: nil))
+        }
+        
+        var request = URLRequest(url: finalURL)
+        request.httpMethod = "GET"
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                return .failure(NSError(domain: "InvalidResponse", code: -3, userInfo: nil))
+            }
+            
+            let decodedResponse = try JSONDecoder().decode([CategoryStatistic].self, from: data)
+            return .success(decodedResponse)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
+    func fetchWalletStatistics(token: String, walletID: Int, month: String) async -> Result<WalletStatistics, Error> {
+        guard let url = URL(string: "http://localhost:8080/wallet/statistics") else {
+            return .failure(NSError(domain: "InvalidURL", code: -1, userInfo: nil))
+        }
+        
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        components?.queryItems = [
+            URLQueryItem(name: "walletID", value: String(walletID)),
+            URLQueryItem(name: "month", value: month),
+        ]
+        
+        guard let finalURL = components?.url else {
+            return .failure(NSError(domain: "InvalidURLComponents", code: -2, userInfo: nil))
+        }
+        
+        var request = URLRequest(url: finalURL)
+        request.httpMethod = "GET"
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                return .failure(NSError(domain: "InvalidResponse", code: -3, userInfo: nil))
+            }
+            if let jsonString = String(data: data, encoding: .utf8) {
+                    print("JSON String: \(jsonString)")
+            }
+            
+            let decodedResponse = try JSONDecoder().decode(WalletStatistics.self, from: data)
+            return .success(decodedResponse)
         } catch {
             return .failure(error)
         }

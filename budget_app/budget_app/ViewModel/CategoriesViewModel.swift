@@ -10,7 +10,8 @@ import Foundation
 @MainActor
 class CategoriesViewModel: ObservableObject {
     
-    @Published var categories: [Category] = []
+    @Published var categories: [Category] = [.selectCategory]
+    @Published var displayableCategories: [Category] = []
     @Published var isLoading = false
     
     private var userSession: String? {
@@ -23,7 +24,9 @@ class CategoriesViewModel: ObservableObject {
             switch await NetworkService.shared.fetchCategories(token: token) {
                 case .success(let categories):
                     isLoading = false
-                    self.categories = categories
+                    self.categories = [.selectCategory]
+                    self.displayableCategories = categories
+                    self.categories.append(contentsOf: categories)
                 case .failure(let error):
                     isLoading = false
                     print("Error fetching categories: \(error.localizedDescription)")

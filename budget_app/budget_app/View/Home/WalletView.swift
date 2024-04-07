@@ -30,10 +30,11 @@ struct WalletView: View {
                         ProgressView()
                     }else{
                         ZStack{
-                            ForEach(0..<viewModel.wallets.count, id: \.self ) { index in
+                            ForEach(0..<viewModel.displayableWallets.count, id: \.self ) { index in
+                                    
                                 VStack {
                                     HStack{
-                                        Text(viewModel.wallets[index].name)
+                                        Text(viewModel.displayableWallets[index].name)
                                             .font(.headline)
                                     }
                                     .padding()
@@ -41,19 +42,19 @@ struct WalletView: View {
                                     Spacer()
                                     
                                     HStack{
-                                        Text((currencySymbols[viewModel.wallets[index].currency] ?? "$"))
+                                        Text((currencySymbols[viewModel.displayableWallets[index].currency] ?? "$"))
                                             .font(.title3.monospaced())
                                         
-                                        Text(String(format: "%.2f", Float(viewModel.wallets[index].balance) / 100.0))
+                                        Text(String(format: "%.2f", Float(viewModel.displayableWallets[index].balance) / 100.0))
                                             .font(.title3.monospaced())
                                         Spacer()
-                                        Image(systemName: viewModel.wallets[index].iconCode)
+                                        Image(systemName: viewModel.displayableWallets[index].iconCode)
                                             .font(.largeTitle)
                                     }
                                     .padding()
                                 }
                                 .frame(width: 250, height: 150)
-                                .background(Color(hex: viewModel.wallets[index].colorCode))
+                                .background(Color(hex: viewModel.displayableWallets[index].colorCode))
                                 .cornerRadius(20)
                                 .opacity(currentIndex == index ? 1.0 : 0.5)
                                 .scaleEffect(currentIndex == index ? 1.2 : 1)
@@ -72,13 +73,13 @@ struct WalletView: View {
                                         }
                                     }else if value.translation.width < -threashold{
                                         withAnimation {
-                                            currentIndex = min(viewModel.wallets.count - 1, currentIndex + 1)
+                                            currentIndex = min(viewModel.displayableWallets.count - 1, currentIndex + 1)
                                         }
                                     }
                                 })
                         )
                         HStack(spacing: 8) {
-                            ForEach(0..<viewModel.wallets.count, id: \.self) { index in
+                            ForEach(0..<viewModel.displayableWallets.count, id: \.self) { index in
                                 Circle()
                                     .fill(currentIndex == index ? Color.primary : Color.gray) // Active dot is primary color; others are gray
                                     .frame(width: 8, height: 8)
@@ -89,28 +90,28 @@ struct WalletView: View {
                         .padding(.top, 20)
                         
                         LazyVStack {
-                            ForEach(0..<viewModel.wallets.count, id: \.self ) { index in
+                            ForEach(0..<viewModel.displayableWallets.count, id: \.self ) { index in
                                 HStack {
                                     Circle()
-                                        .fill(Color(hex: viewModel.wallets[index].colorCode))
+                                        .fill(Color(hex: viewModel.displayableWallets[index].colorCode))
                                         .frame(width: 30, height: 30)
                                         .overlay(
-                                            Image(systemName: viewModel.wallets[index].iconCode)
+                                            Image(systemName: viewModel.displayableWallets[index].iconCode)
                                                 .foregroundColor(.white)
                                         )
-                                    Text(viewModel.wallets[index].name)
+                                    Text(viewModel.displayableWallets[index].name)
                                         .font(.title3.monospaced())
                                     
                                     Spacer()
                                     
-                                    Text((currencySymbols[viewModel.wallets[index].currency] ?? "$"))
+                                    Text((currencySymbols[viewModel.displayableWallets[index].currency] ?? "$"))
                                         .font(.title3.monospaced())
                                     
-                                    Text(String(format: "%.2f", Float(viewModel.wallets[index].balance) / 100.0))
+                                    Text(String(format: "%.2f", Float(viewModel.displayableWallets[index].balance) / 100.0))
                                         .font(.title3.monospaced())
                                 }
                                 .onTapGesture {
-                                    self.selectedWallet = viewModel.wallets[index]
+                                    self.selectedWallet = viewModel.displayableWallets[index]
                                     self.showingActionSheet = true
                                 }
                                 .padding()
@@ -186,7 +187,7 @@ struct WalletView_Previews: PreviewProvider {
     
     static let viewModel: WalletsViewModel = {
             let vm = WalletsViewModel()
-            vm.wallets = [
+            vm.displayableWallets = [
                 Wallet(id: 1, userID: -1, name: "Groceries", currency: "USD", initialBalance: 10000, balance: 10000, iconCode: "cart", colorCode: "#FF0000", createdAt: ""),
                 Wallet(id: 2, userID: -1, name: "Groceries", currency: "USD", initialBalance: 10000, balance: 10000, iconCode: "cart", colorCode: "#FF0000", createdAt: ""),
                 Wallet(id: 3, userID: -1, name: "Groceries", currency: "USD", initialBalance: 10000, balance: 10000, iconCode: "cart", colorCode: "#FF0000", createdAt: ""),

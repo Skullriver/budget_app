@@ -7,13 +7,33 @@
 
 import Foundation
 
-struct Transfer: Codable {
+struct Transfer: Identifiable, Codable, Hashable {
     let id: Int
     let userID: Int
-    let amount: Float
+    let amount: Int
     let description: String
-    let date: Date
+    let date: String
     let sourceWalletID: Int
     let destinationWalletID: Int
-    let createdAt: Date
+    let createdAt: String
+}
+
+struct CreateTransferRequest: Codable {
+    var amount: Int
+    var date: String
+    var sourceWalletID: Int
+    var destinationWalletID: Int
+    var notes: String?
+}
+
+struct TransferResponse: Identifiable, Codable, Hashable {
+    let id: Int
+    let userID: Int
+    let amount: Int
+    let description: String
+    let date: String
+    let sourceWalletID: Int
+    let destinationWalletID: Int
+    let walletCurrency: String
+    let createdAt: String
 }

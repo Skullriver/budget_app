@@ -11,17 +11,10 @@ import Combine
 struct AddTransactionView: View {
 
     @Environment(\.dismiss) private var dismiss
-    @State var amount: Int = 0
-    @State var selectedType:TransactionType = .income
-    
-    @State var transactionDate: Date = Date()
-    @State var notes: String = ""
-    // Assuming 'selectedFromWallet' and 'selectedToWallet' for Transfer type
-    @State var selectedFromWallet: Wallet = .placeholder
-    @State var selectedToWallet: Wallet = .placeholder
     
     @EnvironmentObject var categoriesViewModel: CategoriesViewModel
     @EnvironmentObject var walletsViewModel: WalletsViewModel
+    @EnvironmentObject var transactionViewModel: TransactionViewModel
     
     init() {
         UISegmentedControl.appearance().backgroundColor = .primaryButton.withAlphaComponent(0.1)
@@ -30,26 +23,20 @@ struct AddTransactionView: View {
         UISegmentedControl.appearance().setTitleTextAttributes([.font : UIFont.monospacedSystemFont(ofSize: 14, weight: .regular)], for: .normal)
     }
 
-    
-    @State private var selectedCategory: Category = .selectCategory
-    @State private var selectedWallet: Wallet = .placeholder
-    
     var body: some View {
         NavigationView{
-            ZStack {
-                // Background color applied here to cover full screen
-                Color.background
-                    .edgesIgnoringSafeArea(.all)
+            
+            ScrollView{
                 
-                if categoriesViewModel.isLoading {
+                if categoriesViewModel.isLoading || walletsViewModel.isLoading {
                     ProgressView()
                 }else{
                     VStack{
-                        CurrencyField(value: $amount)
+                        CurrencyField(value: $transactionViewModel.amount)
                             .font(.largeTitle.monospaced())
                             .padding()
                         
-                        Picker("t", selection: $selectedType) {
+                        Picker("t", selection: $transactionViewModel.selectedType) {
                             ForEach(TransactionType.allCases, id: \.self) {
                                 Text($0.rawValue)
                             }
@@ -57,8 +44,8 @@ struct AddTransactionView: View {
                         .pickerStyle(.segmented)
                         .padding()
                         
-                        if selectedType != .transfer {
-                            PickerCategoryView(selectedCategory: $selectedCategory, categoriesViewModel: categoriesViewModel)
+                        if transactionViewModel.selectedType != .transfer {
+                            PickerCategoryView(selectedCategory: $transactionViewModel.selectedCategory, categoriesViewModel: categoriesViewModel)
                         }
                         
                         HStack{
@@ -68,70 +55,36 @@ struct AddTransactionView: View {
                             
                             Spacer()
                             // Date Picker
-                            DatePicker("", selection: $transactionDate, displayedComponents: .date)
-                                .padding()
+                            DatePicker("", selection: $transactionViewModel.transactionDate, displayedComponents: .date)
                         }
                         .padding(.horizontal, 35)
                         
                         
-                        if selectedType == .transfer {
-                            PickerWalletView(label: "From Wallet:", selectedWallet: $selectedFromWallet, walletsViewModel: walletsViewModel)
-                            PickerWalletView(label: "To Wallet:", selectedWallet: $selectedToWallet, walletsViewModel: walletsViewModel)
+                        if transactionViewModel.selectedType == .transfer {
+                            PickerWalletView(label: "From Wallet:", selectedWallet: $transactionViewModel.selectedFromWallet, walletsViewModel: walletsViewModel)
+                            PickerWalletView(label: "To Wallet:", selectedWallet: $transactionViewModel.selectedToWallet, walletsViewModel: walletsViewModel)
                         } else {
                             // For Income and Expense, show Wallet Picker
-                            PickerWalletView(label: "Wallet:", selectedWallet: $selectedWallet, walletsViewModel: walletsViewModel)
+                            PickerWalletView(label: "Wallet:", selectedWallet: $transactionViewModel.selectedWallet, walletsViewModel: walletsViewModel)
                         }
                         
-                        TextField("Notes", text: $notes)
+                        TextField("Notes", text: $transactionViewModel.notes)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .padding()
-                                                
-                        
-//                        HStack{
-//                            Text("Category:")
-//                                .font(.system(size: 14).monospaced().bold())
-//                                .foregroundColor(Color.text)
-//                            
-//                            Spacer()
-//                            Picker("Category", selection: $selectedCategory) {
-//                                ForEach(categoriesViewModel.categories) { category in
-//                                    Text(category.name)
-//                                        .font(.system(size: 12).monospaced().bold())
-//                                        .foregroundColor(Color.text)
-//                                        .tag(category)
-//                                }
-//                            }
-//                        }
-//                        .padding(.horizontal, 35)
-                        
-//                        HStack{
-//                            Text("Wallet:")
-//                                .font(.system(size: 14).monospaced().bold())
-//                                .foregroundColor(Color.text)
-//                            
-//                            Spacer()
-//                            Picker("Wallet", selection: $selectedWallet) {
-//                                ForEach(walletsViewModel.wallets) { wallet in
-//                                    Text(wallet.name)
-//                                        .font(.system(size: 12).monospaced().bold())
-//                                        .foregroundColor(Color.text)
-//                                        .tag(wallet)
-//                                }
-//                            }
-//                        }
-//                        .padding(.horizontal, 35)
+                                 
                         
                         Spacer()
                         
                         Button {
-                            
+                            Task {
+                                await transactionViewModel.createTransaction()
+                                dismiss()
+                            }
                         } label: {
                             SecondaryButton(title: "Save")
                         }
                         .padding()
 
-                        
-                        
                     }
                     .navigationBarTitleDisplayMode(.inline)
                     
@@ -155,7 +108,7 @@ struct AddTransactionView: View {
                     
                 }
                 
-            }
+            }.background(Color.background)
             
         }
         .onAppear {
@@ -166,12 +119,6 @@ struct AddTransactionView: View {
         }
     
     }
-}
-
-enum TransactionType: String, CaseIterable {
-    case income = "Income"
-    case expense = "Expense"
-    case transfer = "Transfer"
 }
 
 // Helper views for categories and wallets picker
@@ -228,6 +175,11 @@ struct PickerWalletView: View {
 
 struct AddTransactionView_Previews: PreviewProvider {
     
+    static let transactionViewModel: TransactionViewModel = {
+        let vm = TransactionViewModel()
+        return vm
+    }()
+    
     static let viewModel: CategoriesViewModel = {
             let vm = CategoriesViewModel()
             vm.categories = [
@@ -259,5 +211,6 @@ struct AddTransactionView_Previews: PreviewProvider {
         AddTransactionView()
             .environmentObject(viewModel)
             .environmentObject(walletViewModel)
+            .environmentObject(transactionViewModel)
     }
 }
